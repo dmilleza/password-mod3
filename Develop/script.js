@@ -7,6 +7,7 @@ function randomInt(min, max) {
     max = min
     min = 0
   }
+
   var rand = Math.random()
   return Math.floor(min*(1 - rand) + rand*max)
 }
@@ -20,11 +21,8 @@ function promptUserForInputType(inputType, message, isValidCondition) {
   var userInput = window.prompt(message)
   var isValidType
 
-  let inputObject = {
-    // value:...
-    // isValidType:...
-    // isValidCondition:...
-    canceled: userInput === null
+  var inputObject = {
+  canceled: userInput === null
   }
 
   // validate input for number type
@@ -48,6 +46,7 @@ function newPasswordOption(name, generator) {
   }
 }
 
+// generate special characters at random from ASCII code
 function getRandomSymbol() {
   return String.fromCharCode(randomInt(33, 47))
 }
@@ -66,6 +65,7 @@ function getRandomLetterLower() {
 function getRandomLetterUpper() {
   return getRandomLetterLower().toUpperCase()
 }
+
 
 function generatePassword(minLength, maxLength) {
 
@@ -98,24 +98,53 @@ function generatePassword(minLength, maxLength) {
     }
   }
 
+  // list of existing password options
+  var passwordOptions = [
+    newPasswordOption("uppercase letters", getRandomLetterUpper),
+    newPasswordOption("lowercase letters", getRandomLetterLower),
+    newPasswordOption("symbols", getRandomSymbol),
+    newPasswordOption("numbers", getRandomNumber),
+  ]
 
-// 1. Prompt user for the password criteria 
-//  a. Password length 8 < 128
-//  b. Lowercase, uppercase, numbers, special characters
-// 2. Validate the input
-// 3. Generate password based on criteria
-// 4. Display password to the page
+  // an empty array where the user's selected options will be stored
+  var selectedPasswordOptions = []
+
+  // iterate over all existing password options, prompting the user for each one
+  for (var i = 0; i < passwordOptions.length; i++) {
+    var option = passwordOptions[i]
+    var userConfirmed = window.confirm("Would you like to include " + option.name + " in your password? (Okay = Yes, Cancel = No)")
+
+    // push option to 'selectedPasswordOptions' array if the user confirms the option
+    if (userConfirmed) selectedPasswordOptions.push(option)
+  }
+
+  // if the user selected no options, choose one at random
+  if (selectedPasswordOptions.length === 0) {
+    var randomOption = getRandomIndex(passwordOptions)
+    window.alert("No specifications were given. Generating password with: " + randomOption.name)
+    selectedPasswordOptions.push(randomOption)
+  }
+
+  // password generation
+  var passwordBuffer = ""
+  for (var i = 0; i < passwordLengthResult.value; i++) {
+    passwordBuffer += getRandomIndex(selectedPasswordOptions).generate()
+  }
+
+  // return password
+  return passwordBuffer
+}
 
 // Write password to the #password input
 function writePassword() {
-  var password = generatePassword();
+  var password = generatePassword(8, 128);
   var passwordText = document.querySelector("#password");
 
-  passwordText.value = password;
-
+  if (password) passwordText.value = password;
 }
 
+// get generate button from the HTML
 var generateBtn = document.querySelector("#generate");
 
-// Add event listener to generate button
+// add "click" event to the generate button
 generateBtn.addEventListener("click", writePassword);
