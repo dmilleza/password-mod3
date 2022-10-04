@@ -1,6 +1,6 @@
 // Assignment code here
 // Get references to the #generate element
-var generateBtn = document.querySelector("#generate");
+
 
 function randomInt(min, max) {
   if (!max) {
@@ -9,8 +9,37 @@ function randomInt(min, max) {
   }
   var rand = Math.random()
   return Math.floor(min*(1 - rand) + rand*max)
+}
 
+function getRandomIndex(list) {
+  return list[randomInt(list.length)]
+}
 
+// prompt the user for a specified value, and a given condition function
+function promptUserForInputType(inputType, message, isValidCondition) {
+  var userInput = window.prompt(message)
+  var isValidType
+
+  let inputObject = {
+    // value:...
+    // isValidType:...
+    // isValidCondition:...
+    canceled: userInput === null
+  }
+
+  // validate input for number type
+  if (inputType === "number") {
+    userInput = parseInt(userInput)
+    isValidType = !isNaN(userInput)
+  }
+
+  // assign object fields
+  inputObject.isValidType = isValidType
+  inputObject.value = userInput
+  inputObject.isValidCondition = isValidType && isValidCondition(userInput)
+
+  return inputObject
+}
 
 // 1. Prompt user for the password criteria 
 //  a. Password length 8 < 128
@@ -27,6 +56,8 @@ function writePassword() {
   passwordText.value = password;
 
 }
+
+var generateBtn = document.querySelector("#generate");
 
 // Add event listener to generate button
 generateBtn.addEventListener("click", writePassword);
